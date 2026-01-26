@@ -1,0 +1,8 @@
+
+{
+  "name": "VondraLink – AI Shopping Engine",
+  "description": "A futuristic AI-powered budget and lifestyle shopping engine featuring a tactical Trade-Off engine and contextual gift finding.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VondraLink | AI Shopping Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              background: {
+                dark: '#080808',
+                light: '#FDFDFD'
+              },
+              coral: '#FF7E5F',
+              teal: '#20E2D7',
+              cyber: {
+                purple: '#B066FE',
+                blue: '#48BBFE'
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            boxShadow: {
+              'smooth': '0 30px 60px -12px rgba(0, 0, 0, 0.45), 0 18px 36px -18px rgba(0, 0, 0, 0.5)',
+              'smooth-light': '0 30px 60px -12px rgba(0, 0, 0, 0.05), 0 18px 36px -18px rgba(0, 0, 0, 0.08)',
+              'glow-teal': '0 0 60px -10px rgba(32, 226, 215, 0.25)',
+              'glow-coral': '0 0 60px -10px rgba(255, 126, 95, 0.25)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow-x: hidden;
+      }
+      .dark body {
+        background-color: #080808;
+        color: #ffffff;
+      }
+      .light body {
+        background-color: #FDFDFD;
+        color: #1A1A1A;
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.015);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .light .glass {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+      }
+      .cyber-gradient-text {
+        background: linear-gradient(135deg, #FF7E5F, #20E2D7, #B066FE, #FF7E5F);
+        background-size: 300% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient-flow 8s ease infinite;
+      }
+      @keyframes gradient-flow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      .scan-line {
+        background: linear-gradient(to bottom, transparent, #20E2D7, transparent);
+        height: 2px;
+        position: absolute;
+        width: 100%;
+        box-shadow: 0 0 20px #20E2D7;
+        z-index: 10;
+      }
+      .bg-blob {
+        position: fixed;
+        width: 70vw;
+        height: 70vw;
+        border-radius: 50%;
+        filter: blur(140px);
+        opacity: 0.12;
+        z-index: -1;
+        pointer-events: none;
+        transition: transform 1s ease-out, opacity 1s ease;
+      }
+      .dark .bg-blob { opacity: 0.1; }
+      .light .bg-blob { opacity: 0.06; }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar { width: 5px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, 0.2); border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.4); }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "framer-motion": "https://esm.sh/framer-motion@^12.29.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="antialiased">
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
