@@ -107,12 +107,6 @@ We measure the success of VondraLink based on:
 **Speed:** Near real-time delivery of results (searching millions of items in <1 second).
 
 
+![Data Pipeline architecture](".\VondraLink\Images_OR_PATH")
 
 ---
-
-Would you like me to generate the Python code for the Qdrant indexing script based on this data format?
-<<<<<<< HEAD
-
-![Alt Text](".\VondraLink\Images_OR_PATH")
-=======
->>>>>>> f5da6680c52eab5c5fd10d4b1645e030b4ec90f0
