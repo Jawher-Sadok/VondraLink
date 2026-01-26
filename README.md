@@ -107,7 +107,7 @@ We measure the success of VondraLink based on:
 **Speed:** Near real-time delivery of results (searching millions of items in <1 second).
 
 
-<img src="/VondraLink/Images/Untitled diagram-2026-01-26-192024.png" alt="Description of image" width="800" height="500">
+<img src="/VondraLink/Images/Untitled diagram-2026-01-26-192024.png" alt="Description of image" width="800" height="1000">
 
 
 ---
