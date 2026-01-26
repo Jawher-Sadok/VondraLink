@@ -109,4 +109,7 @@ We measure the success of VondraLink based on:
 
 ![Data Pipeline architecture](/VondraLink/Images/Untitled diagram-2026-01-26-192024.png)
 
+<img src="/VondraLink/Images/Untitled diagram-2026-01-26-192024.png" alt="Description of image" width="500" height="300">
+
+
 ---
