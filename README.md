@@ -107,6 +107,6 @@ We measure the success of VondraLink based on:
 **Speed:** Near real-time delivery of results (searching millions of items in <1 second).
 
 
-![Data Pipeline architecture](".\VondraLink\Images_OR_PATH")
+![Data Pipeline architecture]("./VondraLink/Images/Untitled diagram-2026-01-26-192024.png")
 
 ---
