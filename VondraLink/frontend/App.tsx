@@ -6,7 +6,7 @@ import TradeOffEngine from './components/TradeOffEngine';
 import MobileDock from './components/MobileDock';
 import { SearchState } from './types';
 import { MOCK_PRODUCTS } from './constants';
-import { analyzeShoppingIntent } from './services/geminiService';
+import { searchProducts } from './services/apiService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const App: React.FC = () => {
@@ -29,7 +29,7 @@ const App: React.FC = () => {
   const handleSearch = async (query: string, budgetLimit?: number, image?: string) => {
     setSearch(prev => ({ ...prev, isSearching: true, query, budgetLimit }));
     
-    const results = await analyzeShoppingIntent(query, budgetLimit, image);
+    const results = await searchProducts(query, budgetLimit, image);
     
     setSearch({
       query,
@@ -76,7 +76,7 @@ const App: React.FC = () => {
                   <div className="absolute inset-4 rounded-full border border-current opacity-5 animate-pulse" />
                 </div>
                 <div className="text-teal font-mono tracking-[0.5em] text-[10px] uppercase animate-pulse font-bold">
-                  Parsing Market Substitutes...
+                  Searching Database...
                 </div>
               </motion.div>
             ) : (
