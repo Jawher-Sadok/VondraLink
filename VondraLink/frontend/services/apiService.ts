@@ -2,17 +2,34 @@ import { TradeOffPair } from "../types";
 
 const API_BASE_URL = "http://localhost:8000";
 
+// Convert File to base64 string
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function searchProducts(
   query: string,
   budgetLimit?: number,
-  imageData?: string
+  imageFile?: File
 ): Promise<TradeOffPair[]> {
   try {
+    let imageBase64: string | undefined;
+    
+    // Convert image File to base64 if provided
+    if (imageFile) {
+      imageBase64 = await fileToBase64(imageFile);
+    }
+    
     // Determine search mode based on whether image is provided
-    const mode = imageData ? "image" : "text";
+    const mode = imageBase64 ? "image" : "text";
     
     const requestBody = {
-      query: query,
+      query: imageBase64 || query,
       mode: mode,
       limit: 10,
       use_mmr: true,

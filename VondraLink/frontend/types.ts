@@ -29,6 +29,6 @@ export interface SearchState {
   query: string;
   budgetLimit?: number;
   isSearching: boolean;
-  imageInput?: string;
+  imageInput?: string | File;
   results: TradeOffPair[];
 }
