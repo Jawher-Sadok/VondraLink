@@ -323,7 +323,7 @@ HF_TOKEN=hf_your_token_here
 N8N_WEBHOOK_URL=https://your-n8n-instance/webhook/personality-to-product
 ```
 
-> ⚠️ **Note**: The current codebase has hardcoded credentials in `qdrant_ops.py` and `embedding.py`. For production, move these to environment variables.
+
 
 ---
 
@@ -368,6 +368,7 @@ uvicorn main:app --reload --log-level debug
 | `Pillow` | ≥10.2.0 | Image processing |
 | `requests` | ≥2.31.0 | HTTP client |
 | `pandas` | ≥2.0.0 | Data manipulation |
+| `python-dotenv` | ≥1.0.0 | Environment variables |
 
 ### Frontend (Node.js)
 

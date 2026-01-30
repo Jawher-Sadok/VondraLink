@@ -1,10 +1,15 @@
 from qdrant_client import QdrantClient, models
 from typing import List
+import os
+from dotenv import load_dotenv
 
-# Qdrant Cloud Configuration
-QDRANT_URL = "https://656ff6c0-88ba-4b7c-ab69-0b1f23796f3f.europe-west3-0.gcp.cloud.qdrant.io:6333"
-QDRANT_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.ID2ng5RvxLCAHYjxpl5Icea3v8mCL3q4TH-_O73LeUU"
-COLLECTION_NAME = "tech_products_fast"
+# Load environment variables from .env file
+load_dotenv()
+
+# Qdrant Cloud Configuration from environment variables
+QDRANT_URL = os.getenv('QDRANT_URL', 'http://localhost:6333')
+QDRANT_API_KEY = os.getenv('QDRANT_API_KEY')
+COLLECTION_NAME = os.getenv('QDRANT_COLLECTION_NAME', 'tech_products_fast')
 
 client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
 

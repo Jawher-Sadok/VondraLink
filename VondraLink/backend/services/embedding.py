@@ -5,7 +5,15 @@ from typing import Union, List
 import os
 import io
 import base64
-os.environ['HF_TOKEN'] = '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'
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Set HuggingFace token from environment variable
+hf_token = os.getenv('HF_TOKEN')
+if hf_token:
+    os.environ['HF_TOKEN'] = hf_token
 
 # Use the SAME model that was used to ingest data into Qdrant
 print("loeading CLIP model for embeddings..." )
