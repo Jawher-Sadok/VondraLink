@@ -1,0 +1,56 @@
+section0:
+Q01:First, let's get the fit right. What is your style focus?
+	🔘 Masculine / Menswear:"Sharp cuts, utility, and structured silhouettes."
+
+	🔘 Feminine / Womenswear:"Softer lines, chic aesthetics, and fitted styles."
+	🔘 Gender Neutral / Unisex:"Oversized fits, streetwear, and utility-first gear."
+
+	🔘 Gifting / Mixed:"I’m shopping for others or browsing for the household."
+
+q02:Which 'Era' resonates with you most?
+	🔘 The New Wave (Gen Z)"I chase what's next. I love bold, experimental, and viral trends."
+
+	🔘 The Golden Era (Millennial):"I value experiences and nostalgia. Give me that 90s/00s comfort."
+
+	🔘 The Classic (Gen X / Mature):"I prefer timeless design. Quality and reliability over hype."
+Section 1: The Wealth Detectors 
+	Q1. What’s your shopping philosophy?
+	🔘 The Value Hunter:"I love the thrill of finding a hidden gem, a dupe, or the best bang-for-my-buck."
+	🔘 The Researcher:"I read every review. I want the reliable, top-rated choice in the mid-range."
+	🔘 The 'Buy It For Life' Purist:"I hate replacing things. I’ll pay a premium once for something that lasts forever."
+	🔘 The Enthusiast:"I want the absolute cutting-edge. If it’s the best performance/design, the price is secondary."
+	Q2. You’ve had a great month. How do you treat yourself?
+	🔘 Small & Sweet:"A nice dinner out, a new book, or a fresh game."
+	🔘 The Solid Upgrade:"A new pair of kicks, a gadget refresh, or a weekend getaway."
+	🔘 The Big Splurge:"A designer piece, high-end tech, or an exclusive experience."
+Section 2: The Persona
+	Q3. Which of these describes your current 'Mode'?
+	🔘 The Creator:"I make things. My space is full of tools, sketchbooks, code, or cameras."
+	🔘 The Optimizer:"I need efficiency. I want my workflow to be fast, ergonomic, and distraction-free."
+
+	🔘 The Nester:"Home is my sanctuary. I care about comfort, lighting, cooking, and hosting."
+
+	🔘 The Explorer:"I’m rarely at a desk. I need gear that travels well and survives the outdoors."
+Section 3: The Aesthetic (Vibe)
+
+	Q4. Pick the aesthetic that feels like 'You'.
+	🔘 Minimalist:"Less is more. Clean lines, matte white/black, no clutter."
+
+	🔘 Industrial & Raw:"Exposed brick, dark wood, leather, steel, and warm lighting."
+
+	🔘 Retro / Heritage:"Nostalgic vibes. Analog tech, 90s colors, vinyl, and classic design."
+
+	🔘 Cyber / Future:"RGB lighting, neon accents, transparent tech, and bold geometry."
+
+Section 4: The "Wildcard" (Hobbies)
+
+	Q5. It’s a free Sunday. What are you likely doing?
+	🔘 Deep Focus: "Coding, Writing, or Learning something new."
+
+	🔘 The Grind: "Gaming, Streaming, or Tinkering with hardware."
+
+	🔘 Recharging: "Reading, Yoga, Meditation, or Spa day."
+
+	🔘 Getting Out: "Hiking, Photography, Cycling, or Gym."
+
+	🔘 Hosting: "Cooking intricate meals, Coffee brewing, or Mixology."

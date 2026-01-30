@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import HeroBento, { ShoppingTask } from "./components/HeroBento";
 import TradeOffEngine from "./components/TradeOffEngine";
 import MobileDock from "./components/MobileDock";
+import HomePage from "./components/HomePage";
 import { SearchState ,RecommendationRequest } from "./types";
 import { searchProducts } from "./services/apiService";
 import { getRecommendations } from "./services/apiService";
@@ -21,7 +22,7 @@ const QuestionGroup = ({
 }: {
   label: string;
   name: string;
-  options: { id: string; label: string }[];
+  options: { id: string; label: string; description?: string }[];
   value: string;
   onChange: (name: string, value: string) => void;
 }) => (
@@ -44,7 +45,12 @@ const QuestionGroup = ({
             <div className="mt-1 w-5 h-5 rounded-full border-2 border-white/20 flex items-center justify-center peer-checked:border-teal shrink-0">
               <div className="w-2.5 h-2.5 rounded-full bg-teal scale-0 peer-checked:scale-100 transition-transform" />
             </div>
-            <span className="text-sm leading-relaxed">{opt.label}</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-medium leading-relaxed">{opt.label}</span>
+              {opt.description && (
+                <span className="text-xs text-gray-500 peer-checked:text-gray-400">{opt.description}</span>
+              )}
+            </div>
           </div>
         </label>
       ))}
@@ -59,6 +65,16 @@ const App: React.FC = () => {
   const [hasEntered, setHasEntered] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [activeTask, setActiveTask] = useState<ShoppingTask>("vibe");
+  const [activeView, setActiveView] = useState<"home" | "explore">("home");
+
+  // Generate or retrieve user ID from localStorage
+  const [userId, setUserId] = useState<string>(() => {
+    const stored = localStorage.getItem("vondralink_user_id");
+    if (stored) return stored;
+    const newId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem("vondralink_user_id", newId);
+    return newId;
+  });
 
   // All form choices
   const [formState, setFormState] = useState<any>({
@@ -211,7 +227,7 @@ const App: React.FC = () => {
   const handleSearch = async (query: string, budgetLimit?: number, image?: File) => {
     setSearch((prev) => ({ ...prev, isSearching: true, query, budgetLimit }));
     
-    const results = await searchProducts(query, budgetLimit, image);
+    const results = await searchProducts(query, budgetLimit, image, userId);
     
     setSearch({
       query,
@@ -283,10 +299,10 @@ const App: React.FC = () => {
                   label="What is your style focus?"
                   name="styleFocus"
                   options={[
-                    { id: "masculine", label: 'Masculine / Menswear' },
-                    { id: "feminine", label: 'Feminine / Womenswear' },
-                    { id: "neutral", label: 'Gender Neutral / Unisex' },
-                    { id: "mixed", label: 'Gifting / Mixed' },
+                    { id: "masculine", label: 'Masculine / Menswear', description: 'Sharp cuts, utility, and structured silhouettes.' },
+                    { id: "feminine", label: 'Feminine / Womenswear', description: 'Softer lines, chic aesthetics, and fitted styles.' },
+                    { id: "neutral", label: 'Gender Neutral / Unisex', description: 'Oversized fits, streetwear, and utility-first gear.' },
+                    { id: "mixed", label: 'Gifting / Mixed', description: "I'm shopping for others or browsing for the household." },
                   ]}
                   value={formState.styleFocus}
                   onChange={handleRadioChange}
@@ -296,9 +312,9 @@ const App: React.FC = () => {
                   label="Which 'Era' resonates with you most?"
                   name="era"
                   options={[
-                    { id: "genz", label: 'Gen Z' },
-                    { id: "millennial", label: 'Millennial' },
-                    { id: "genx", label: 'Gen X' },
+                    { id: "genz", label: 'The New Wave (Gen Z)', description: 'I chase what\'s next. I love bold, experimental, and viral trends.' },
+                    { id: "millennial", label: 'The Golden Era (Millennial)', description: 'I value experiences and nostalgia. Give me that 90s/00s comfort.' },
+                    { id: "genx", label: 'The Classic (Gen X / Mature)', description: 'I prefer timeless design. Quality and reliability over hype.' },
                   ]}
                   value={formState.era}
                   onChange={handleRadioChange}
@@ -308,22 +324,22 @@ const App: React.FC = () => {
                   label="What’s your shopping philosophy?"
                   name="philosophy"
                   options={[
-                    { id: "value", label: 'The Value Hunter' },
-                    { id: "researcher", label: 'The Researcher' },
-                    { id: "bifl", label: 'Buy It For Life' },
-                    { id: "enthusiast", label: 'The Enthusiast' },
+                    { id: "value", label: 'The Value Hunter', description: 'I love the thrill of finding a hidden gem, a dupe, or the best bang-for-my-buck.' },
+                    { id: "researcher", label: 'The Researcher', description: 'I read every review. I want the reliable, top-rated choice in the mid-range.' },
+                    { id: "bifl", label: "The 'Buy It For Life' Purist", description: "I hate replacing things. I'll pay a premium once for something that lasts forever." },
+                    { id: "enthusiast", label: 'The Enthusiast', description: "I want the absolute cutting-edge. If it's the best performance/design, the price is secondary." },
                   ]}
                   value={formState.philosophy}
                   onChange={handleRadioChange}
                 />
 
                 <QuestionGroup
-                  label="How do you treat yourself?"
+                  label="You've had a great month. How do you treat yourself?"
                   name="treat"
                   options={[
-                    { id: "small", label: 'Small & Sweet' },
-                    { id: "upgrade", label: 'The Solid Upgrade' },
-                    { id: "splurge", label: 'The Big Splurge' },
+                    { id: "small", label: 'Small & Sweet', description: 'A nice dinner out, a new book, or a fresh game.' },
+                    { id: "upgrade", label: 'The Solid Upgrade', description: 'A new pair of kicks, a gadget refresh, or a weekend getaway.' },
+                    { id: "splurge", label: 'The Big Splurge', description: 'A designer piece, high-end tech, or an exclusive experience.' },
                   ]}
                   value={formState.treat}
                   onChange={handleRadioChange}
@@ -333,23 +349,23 @@ const App: React.FC = () => {
                   label="Which describes your current 'Mode'?"
                   name="mode"
                   options={[
-                    { id: "creator", label: 'The Creator' },
-                    { id: "optimizer", label: 'The Optimizer' },
-                    { id: "nester", label: 'The Nester' },
-                    { id: "explorer", label: 'The Explorer' },
+                    { id: "creator", label: 'The Creator', description: 'I make things. My space is full of tools, sketchbooks, code, or cameras.' },
+                    { id: "optimizer", label: 'The Optimizer', description: 'I need efficiency. I want my workflow to be fast, ergonomic, and distraction-free.' },
+                    { id: "nester", label: 'The Nester', description: 'Home is my sanctuary. I care about comfort, lighting, cooking, and hosting.' },
+                    { id: "explorer", label: 'The Explorer', description: "I'm rarely at a desk. I need gear that travels well and survives the outdoors." },
                   ]}
                   value={formState.mode}
                   onChange={handleRadioChange}
                 />
 
                 <QuestionGroup
-                  label="Pick your aesthetic."
+                  label="Pick the aesthetic that feels like 'You'."
                   name="aesthetic"
                   options={[
-                    { id: "minimalist", label: 'Minimalist' },
-                    { id: "industrial", label: 'Industrial' },
-                    { id: "retro", label: 'Retro' },
-                    { id: "cyber", label: 'Cyber' },
+                    { id: "minimalist", label: 'Minimalist', description: 'Less is more. Clean lines, matte white/black, no clutter.' },
+                    { id: "industrial", label: 'Industrial & Raw', description: 'Exposed brick, dark wood, leather, steel, and warm lighting.' },
+                    { id: "retro", label: 'Retro / Heritage', description: 'Nostalgic vibes. Analog tech, 90s colors, vinyl, and classic design.' },
+                    { id: "cyber", label: 'Cyber / Future', description: 'RGB lighting, neon accents, transparent tech, and bold geometry.' },
                   ]}
                   value={formState.aesthetic}
                   onChange={handleRadioChange}
@@ -359,11 +375,11 @@ const App: React.FC = () => {
                   label="It’s a free Sunday. What are you likely doing?"
                   name="sunday"
                   options={[
-                    { id: "focus", label: 'Coding & Writing' },
-                    { id: "grind", label: 'Gaming & Hardware' },
-                    { id: "recharge", label: 'Yoga & Meditation' },
-                    { id: "out", label: 'Hiking & Cycling' },
-                    { id: "hosting", label: 'Cooking & Mixology' },
+                    { id: "focus", label: 'Deep Focus', description: 'Coding, Writing, or Learning something new.' },
+                    { id: "grind", label: 'The Grind', description: 'Gaming, Streaming, or Tinkering with hardware.' },
+                    { id: "recharge", label: 'Recharging', description: 'Reading, Yoga, Meditation, or Spa day.' },
+                    { id: "out", label: 'Getting Out', description: 'Hiking, Photography, Cycling, or Gym.' },
+                    { id: "hosting", label: 'Hosting', description: 'Cooking intricate meals, Coffee brewing, or Mixology.' },
                   ]}
                   value={formState.sunday}
                   onChange={handleRadioChange}
@@ -385,35 +401,63 @@ const App: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Header theme={theme} toggleTheme={toggleTheme} onNotifyClick={() => setHasEntered(false)} />
+            <Header 
+              theme={theme} 
+              toggleTheme={toggleTheme} 
+              onNotifyClick={() => setHasEntered(false)}
+              activeView={activeView}
+              setActiveView={setActiveView}
+            />
             <main className="pb-32 relative z-10">
-              <HeroBento
-                onSearch={handleSearch}
-                isSearching={search.isSearching}
-                activeTask={activeTask}
-                setActiveTask={setActiveTask}
-              />
-              <div id="results" className="mt-24">
-                <AnimatePresence mode="wait">
-                  {search.isSearching ? (
-                    <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center py-48">
-                      <div className="w-20 h-20 border-t-2 border-teal rounded-full animate-spin mb-4" />
-                      <p className="font-mono text-[10px] uppercase tracking-widest text-teal">Analysing Market...</p>
-                    </motion.div>
-                  ) : search.results.length > 0 ? (
-                    <motion.div key="results" className="grid grid-cols-1 gap-12 max-w-7xl mx-auto px-6">
-                      {search.results.map((pair, idx) => <TradeOffEngine key={idx} pair={pair} />)}
-                    </motion.div>
-                  ) : (
-                    <div className="text-center py-48 opacity-40">
-                      <Search size={48} className="mx-auto mb-4" />
-                      <p>Results will appear here...</p>
+              <AnimatePresence mode="wait">
+                {activeView === "home" ? (
+                  <motion.div
+                    key="home"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <HomePage userProfile={formState} recommendedProducts={[]} userId={userId} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="explore"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <HeroBento
+                      onSearch={handleSearch}
+                      isSearching={search.isSearching}
+                      activeTask={activeTask}
+                      setActiveTask={setActiveTask}
+                    />
+                    <div id="results" className="mt-24">
+                      <AnimatePresence mode="wait">
+                        {search.isSearching ? (
+                          <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center py-48">
+                            <div className="w-20 h-20 border-t-2 border-teal rounded-full animate-spin mb-4" />
+                            <p className="font-mono text-[10px] uppercase tracking-widest text-teal">Analysing Market...</p>
+                          </motion.div>
+                        ) : search.results.length > 0 ? (
+                          <motion.div key="results" className="grid grid-cols-1 gap-12 max-w-7xl mx-auto px-6">
+                            {search.results.map((pair, idx) => <TradeOffEngine key={idx} pair={pair} />)}
+                          </motion.div>
+                        ) : (
+                          <div className="text-center py-48 opacity-40">
+                            <Search size={48} className="mx-auto mb-4" />
+                            <p>Results will appear here...</p>
+                          </div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                  )}
-                </AnimatePresence>
-              </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </main>
-            <MobileDock />
+            <MobileDock activeView={activeView} setActiveView={setActiveView} />
           </motion.div>
         )}
       </AnimatePresence>

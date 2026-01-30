@@ -1,0 +1,148 @@
+----------------json input for first webhook------------
+{
+  "user_id": "u_999",
+  "demographics": {
+    "gender": "Male",
+    "generation": "Millennial"
+  },
+  "wealth_signals": {
+    "shopping_philosophy": "The Purist",
+    "treat_preference": "The Investment"
+  },
+  "derived_richness_tier": "Luxury",
+  "lifestyle": {
+    "archetype": "The Optimizer",
+    "vibe": "Industrial",
+    "hobbies": ["Espresso", "Coding"],
+    "mission": "Building a Home Office"
+  },
+  "context": {
+    "recent_purchase_text": "Bought a Herman Miller Embody chair",
+    "last_searches": ["ergonomic mouse", "desk mat", "cable organizer"]
+  }
+}
+-------------------------------llm prompt----------------------------
+You are an Expert Curator for a high-end lifestyle store. Your goal is NOT to find "correct" matches, but to build an exciting, diverse Discovery Feed.
+
+### INPUT DATA ANALYSIS
+You have received a User Profile containing Wealth Tier, Archetype/Vibe, and Context.
+
+### SEARCH QUERY FORMATTING (CRITICAL)
+For each item in the `search_plan`, the `search_query` MUST be a "Dense Triple" to ensure vector database compatibility. Format it as:
+[Core Product Name] + [Technical Materials/Specs] + [Aesthetic/Usage Context]
+
+Example: "Ergonomic Office Chair, breathable mesh with adjustable lumbar support, minimalist industrial workspace furniture"
+
+### THE 4-PILLAR STRATEGY
+1. Pillar: "Complimentary" (Logic)
+- Trigger: If `recent_purchase_text` exists. 
+- Rule: Recommend the accessory, NOT the item itself.
+
+2. Pillar: "Evolution" (Upgrade)
+- Trigger: Look at `last_searches`.
+- Rule: Identify the core problem and offer a "Level Up" premium solution.
+
+3. Pillar: "Aesthetic Match" (The Vibe)
+- Trigger: `lifestyle.vibe` + `demographics`.
+- Rule: Visual style matches in TOTALLY DIFFERENT categories. (Category Diversity is mandatory).
+
+4. Pillar: "Wildcard" (Pure Creativity)
+- Trigger: `lifestyle.archetype` ONLY.
+- Rule: Lateral thinking. What does this archetype crave but hasn't searched for?
+
+### CRITICAL DIVERSITY & PRICE RULES
+- Category Ban: Max 2 items from the same category.
+- Price Calibration: If Luxury, use keywords like "Heritage," "Precision-engineered," "Solid Wood," "Full-grain." If Budget, use "Essential," "Versatile," "Value."
+
+### OUTPUT FORMAT
+Output ONLY valid JSON. No markdown, no intro text.
+{
+  "search_plan": [
+    {
+      "strategy": "string",
+      "priority_weight": float,
+      "search_query": "string",
+      "category_filter": "string",
+      "reasoning": "string"
+    }
+  ]
+}
+------------------------------------llm expected out put-------------------------------------
+{
+  "search_plan": [
+    {
+      "strategy": "complimentary",
+      "priority_weight": 1.0,
+      "search_query": "Transparent Polycarbonate Floor Casters, heavy-duty scuff-free wheels for ergonomic chairs, luxury hardwood protection",
+      "category_filter": "Accessories",
+      "reasoning": "User purchased a Herman Miller Embody; these high-end wheels prevent floor damage and match the premium build."
+    },
+    {
+      "strategy": "evolution",
+      "priority_weight": 0.8,
+      "search_query": "Split Mechanical Keyboard, CNC machined aluminum housing with hot-swappable switches, ergonomic coding tool for the optimizer archetype",
+      "category_filter": "Tech",
+      "reasoning": "Evolution of the 'ergonomic' search history into a high-tier input device."
+    },
+    {
+      "strategy": "vibe_match",
+      "priority_weight": 0.7,
+      "search_query": "Industrial Desk Lamp, solid brass and blackened steel with knurled detailing, ambient lighting for a dark industrial home office",
+      "category_filter": "Lighting",
+      "reasoning": "Matches the 'Industrial' vibe and 'Home Office' mission in a new category."
+    },
+    {
+      "strategy": "wildcard",
+      "priority_weight": 0.5,
+      "search_query": "Manual Lever Espresso Machine, stainless steel and wood construction with pressure profiling, high-end ritual for the Millennial Espresso hobbyist",
+      "category_filter": "Appliances",
+      "reasoning": "Lateral move into the user's 'Espresso' hobby using the 'Purist' shopping philosophy."
+    }
+  ]
+}--------------------------------------next code node----------------------------
+// 1. Get the raw text from the LLM Chain 
+// Added .output because AI Agents often use that instead of .text
+const rawOutput = $input.first().json.output || $input.first().json.text || $input.first().json.response || $input.first().json.content;
+
+if (!rawOutput) {
+  throw new Error("No output found. Check if your LLM node is sending 'text', 'response', or 'output'.");
+}
+
+// 2. Advanced Cleaning (Keeps your trim, adds Markdown stripping and space fixing)
+const cleanJson = rawOutput
+  .replace(/```json/gi, "") // Remove ```json
+  .replace(/```/g, "")      // Remove ending ```
+  .replace(/\u00A0/g, " ")  // Fix those "non-breaking spaces" that break JSON.parse
+  .trim();
+
+// 3. Robust Parse into an Object
+let searchData;
+try {
+  searchData = JSON.parse(cleanJson);
+} catch (e) {
+  // If standard parse fails, try to find the JSON block inside the string
+  try {
+    const start = cleanJson.indexOf('{');
+    const end = cleanJson.lastIndexOf('}') + 1;
+    searchData = JSON.parse(cleanJson.slice(start, end));
+  } catch (secondaryError) {
+    throw new Error("LLM failed to output valid JSON. Raw output: " + rawOutput);
+  }
+}
+
+// 4. Create the Array for the Loop (Keeping your exact mapping)
+const plan = searchData.search_plan || [];
+
+const loopTasks = plan.map(item => {
+  return {
+    json: {
+      query: item.search_query,
+      filter_category: item.category_filter,
+      strategy: item.strategy,
+      weight: item.priority_weight,
+      reasoning: item.reasoning
+    }
+  };
+});
+
+return loopTasks;

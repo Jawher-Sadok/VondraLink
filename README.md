@@ -41,9 +41,10 @@ While the system is built for various product categories (like furniture or clot
 |---------|-------------|
 | **Visual "Vibe-on-a-Budget" Search** | Upload an image of a luxury item, and the system finds visually similar products within your price range |
 | **The "Trade-Off" Engine** | Identify "close substitutes" that save money while preserving key specs (battery life, screen quality, etc.) |
-| **Contextual Gift Finder** | Describe a person's lifestyle in plain English, and the system identifies relevant products through NLU |
+| **Personalized Recommendations** | AI-powered product curation using LLM (Groq/OpenAI) with a 5-pillar strategy system for personalized discovery |
 | **MMR (Maximal Marginal Relevance)** | Diversified search results balancing relevance and variety |
 | **Budget Range Filtering** | Intelligent filtering showing products within 50-100% of your budget limit |
+| **User Activity Tracking** | Tracks search history and viewed products for personalized experiences |
 
 ---
 
@@ -54,7 +55,8 @@ While the system is built for various product categories (like furniture or clot
 - **Vector Database**: Qdrant Cloud
 - **Embeddings**: CLIP (clip-ViT-B-32) via Sentence Transformers
 - **Search Algorithm**: Cosine similarity with MMR for diversity
-- **Webhooks**: n8n for personality-to-product recommendations
+- **LLM Integration**: Groq (Llama 3.3) or OpenAI (GPT-4) for personalized recommendations
+- **User Activity**: In-memory activity tracking for search history and viewed products
 
 ### Frontend
 - **Framework**: React 19 with TypeScript
@@ -92,7 +94,9 @@ VondraLink/
     │   │   ├── embedding.py     # CLIP embedding generation (text & image)
     │   │   ├── qdrant_ops.py    # Qdrant Cloud operations
     │   │   ├── search_service.py # Search with MMR implementation
-    │   │   └── recommendation_service.py # n8n webhook integration
+    │   │   ├── recommendation_service.py # n8n webhook integration
+    │   │   ├── personalized_recommendation_service.py # LLM-powered AI curation
+    │   │   └── user_activity.py # User activity tracking service
     │   └── venv/                # Python virtual environment
     │
     ├── frontend/                # React Frontend
@@ -165,11 +169,8 @@ venv\Scripts\activate
 # macOS/Linux
 source venv/bin/activate
 
-# Install dependencies
+# Install dependencies from root requirements.txt
 pip install -r ../../requirements.txt
-
-# Additional backend dependencies
-pip install fastapi uvicorn sentence-transformers qdrant-client Pillow requests
 ```
 
 ### 3. Frontend Setup
@@ -192,7 +193,7 @@ yarn install
 ### Start the Backend Server
 
 ```bash
-# From VondraLink/VondraLink/backend directory
+# From the root VondraLink directory, navigate to backend
 cd VondraLink/backend
 
 # Activate virtual environment (if not already active)
@@ -200,7 +201,7 @@ cd VondraLink/backend
 # macOS/Linux: source venv/bin/activate
 
 # Run FastAPI server
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn main:app --reload --port 8000
 ```
 
 The backend will be available at: `http://localhost:8000`
@@ -208,7 +209,7 @@ The backend will be available at: `http://localhost:8000`
 ### Start the Frontend Development Server
 
 ```bash
-# From VondraLink/VondraLink/frontend directory (in a new terminal)
+# From the root VondraLink directory, navigate to frontend (in a new terminal)
 cd VondraLink/frontend
 
 # Run development server
@@ -218,7 +219,7 @@ npm run dev
 yarn dev
 ```
 
-The frontend will be available at: `http://localhost:3000`
+The frontend will be available at: `http://localhost:3000` or `http://localhost:5173` (depending on Vite configuration)
 
 ### API Documentation
 
@@ -235,7 +236,8 @@ FastAPI provides automatic API documentation:
 | `GET` | `/` | Health check | - |
 | `GET` | `/ping` | Ping-pong test | - |
 | `POST` | `/search` | Search products | `{ query, mode, limit, use_mmr, lambda_, budget_limit }` |
-| `POST` | `/recommendations` | Get personalized recommendations | `{ description }` |
+| `POST` | `/personalized-recommendations` | AI-powered personalized recommendations | `{ user_id, budget_limit }` |
+| `GET` | `/user-activity/{user_id}` | Get user activity history | - |
 
 ### Search Request Example
 
@@ -319,11 +321,15 @@ QDRANT_API_KEY=your-api-key-here
 # HuggingFace Token (for model downloads)
 HF_TOKEN=hf_your_token_here
 
-# n8n Webhook URL (for recommendations)
+# LLM API Keys (for personalized recommendations)
+GROQ_API_KEY=your-groq-api-key-here
+OPENAI_API_KEY=your-openai-api-key-here
+
+# n8n Webhook URL (optional - for legacy recommendations)
 N8N_WEBHOOK_URL=https://your-n8n-instance/webhook/personality-to-product
 ```
 
-> ⚠️ **Note**: The current codebase has hardcoded credentials in `qdrant_ops.py` and `embedding.py`. For production, move these to environment variables.
+> ⚠️ **Note**: The personalized recommendations feature requires either a Groq API key or OpenAI API key. The system will automatically use Groq if available, falling back to OpenAI.
 
 ---
 
@@ -361,13 +367,17 @@ uvicorn main:app --reload --log-level debug
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| `fastapi` | Latest | Web framework |
+| `fastapi` | ≥0.109.0 | Web framework |
 | `uvicorn` | Latest | ASGI server |
 | `sentence-transformers` | ≥2.2.0 | CLIP embeddings |
 | `qdrant-client` | ≥1.9.0 | Vector database client |
 | `Pillow` | ≥10.2.0 | Image processing |
 | `requests` | ≥2.31.0 | HTTP client |
 | `pandas` | ≥2.0.0 | Data manipulation |
+| `groq` | Latest | Groq LLM API client |
+| `openai` | Latest | OpenAI API client |
+| `python-dotenv` | Latest | Environment variable management |
+| `python-multipart` | ≥0.0.6 | File upload support |
 
 ### Frontend (Node.js)
 

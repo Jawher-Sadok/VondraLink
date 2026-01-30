@@ -5,12 +5,16 @@ from typing import Union, List
 import os
 import io
 import base64
-os.environ['HF_TOKEN'] = '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'
+from dotenv import load_dotenv
 
-# Use the SAME model that was used to ingest data into Qdrant
-print("loeading CLIP model for embeddings..." )
-model = SentenceTransformer('clip-ViT-B-32')
-print("CLIP model loaded successfully.")
+# Load environment variables
+load_dotenv()
+
+# Load CLIP model from environment variable (defaults to clip-ViT-B-32)
+CLIP_MODEL_NAME = os.getenv("CLIP_MODEL_NAME", "sentence-transformers/clip-ViT-B-32")
+print(f"Loading CLIP model: {CLIP_MODEL_NAME}...")
+model = SentenceTransformer(CLIP_MODEL_NAME)
+print("✅ CLIP model loaded successfully.")
 
 def embed_text(text):
     """Encode text into a vector embedding using CLIP"""

@@ -139,6 +139,7 @@ export async function searchProducts(
   query: string,
   budgetLimit?: number,
   imageFile?: File,
+  userId: string = "anonymous",
 ): Promise<TradeOffPair[]> {
   try {
     let imageBase64: string | undefined;
@@ -152,8 +153,9 @@ export async function searchProducts(
       mode: imageBase64 ? "image" : "text",
       limit: 12,
       use_mmr: true,
-      lambda: 0.6,
+      lambda_: 0.6,
       budget_limit: budgetLimit,
+      user_id: userId,
     };
 
     const response = await fetch(`${API_BASE_URL}/search`, {
@@ -258,7 +260,7 @@ function transformResults(
       },
 
       smart: {
-        id: `-${i}`,
+        id: `s-${i}`,
         name: smart.title || "Smart Choice",
         brand: extractBrand(smart.title),
         price: smartPrice,
@@ -288,4 +290,180 @@ function transformResults(
 
   console.log(`✅ Built ${pairs.length} honest trade-off pairs`);
   return pairs;
+}
+
+// =====================
+// User Activity API
+// =====================
+
+export async function getUserActivity(userId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/user-activity/${userId}`);
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("❌ User Activity Error:", error);
+    return null;
+  }
+}
+
+export async function getSearchHistory(userId: string, limit: number = 20): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/search-history/${userId}?limit=${limit}`);
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("❌ Search History Error:", error);
+    return null;
+  }
+}
+
+export async function getViewedProducts(userId: string, limit: number = 20): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/viewed-products/${userId}?limit=${limit}`);
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("❌ Viewed Products Error:", error);
+    return null;
+  }
+}
+
+// =====================
+// Personalized Recommendations API
+// =====================
+
+export interface PersonalizedRecommendationRequest {
+  user_id: string;
+  user_profile: {
+    demographics?: {
+      gender?: string;
+      generation?: string;
+    };
+    wealth_signals?: {
+      shopping_philosophy?: string;
+      treat_preference?: string;
+    };
+    derived_richness_tier?: string;
+    lifestyle?: {
+      archetype?: string;
+      vibe?: string;
+      hobbies?: string[];
+      mission?: string;
+    };
+    context?: {
+      recent_purchase_text?: string;
+      last_searches?: string[];
+    };
+    // Also support direct form fields
+    mode?: string;
+    aesthetic?: string;
+    philosophy?: string;
+    treat?: string;
+    era?: string;
+    styleFocus?: string;
+    sunday?: string;
+  };
+  include_activity?: boolean;
+}
+
+export interface PersonalizedRecommendation {
+  strategy: string;
+  reasoning: string;
+  match_type: string;
+  product: {
+    title: string;
+    price: string;
+    image: string;
+    link: string;
+    score: string;
+  };
+}
+
+export interface PersonalizedRecommendationResponse {
+  user_id: string;
+  recommendations: PersonalizedRecommendation[];
+  count: number;
+}
+
+export async function getPersonalizedRecommendations(
+  userId: string,
+  userProfile: PersonalizedRecommendationRequest["user_profile"],
+  includeActivity: boolean = true
+): Promise<PersonalizedRecommendationResponse | null> {
+  try {
+    const requestBody: PersonalizedRecommendationRequest = {
+      user_id: userId,
+      user_profile: userProfile,
+      include_activity: includeActivity,
+    };
+
+    console.log("📦 Fetching personalized recommendations with profile:", userProfile);
+
+    const response = await fetch(`${API_BASE_URL}/personalized-recommendations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`✅ Received ${data.count} personalized recommendations`);
+    return data;
+  } catch (error) {
+    console.error("❌ Personalized Recommendations Error:", error);
+    return null;
+  }
+}
+
+// Transform personalized recommendations to Product format for display
+export function transformPersonalizedRecommendations(
+  recommendations: PersonalizedRecommendation[]
+): Product[] {
+  return recommendations.map((rec, index) => {
+    // Handle price that might be string or number
+    let priceValue = 0;
+    if (typeof rec.product.price === 'string') {
+      priceValue = parsePrice(rec.product.price);
+    } else if (typeof rec.product.price === 'number') {
+      priceValue = rec.product.price;
+    }
+    
+    // Get image URL - backend uses 'image' field which contains the URL
+    const imageUrl = rec.product.image || "";
+    
+    return {
+      id: `rec-${index}-${Date.now()}`,
+      name: rec.product.title || "Recommended Product",
+      brand: extractBrandFromTitle(rec.product.title),
+      price: priceValue,
+      image: imageUrl,
+      url: rec.product.link || "#",
+      rating: parseFloat(rec.product.score || "0") * 5,
+      description: rec.reasoning || `${rec.strategy} recommendation`,
+      features: [rec.strategy, rec.match_type],
+      specs: {
+        quality: Math.round(parseFloat(rec.product.score || "0") * 100),
+        durability: 80,
+      },
+      tags: [rec.strategy, rec.match_type],
+      category: "Recommended",
+      savings: 0,
+    };
+  });
+}
+
+function extractBrandFromTitle(title: string): string {
+  if (!title) return "Unknown";
+  const words = title.split(" ");
+  return words.length > 1 ? words[0] : "Unknown";
 }
