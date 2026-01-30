@@ -1,4 +1,8 @@
 import React, { useState, useRef } from "react";
+import {
+  getRecommendations,
+  transformRecommendations,
+} from "../services/apiService";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Scan,
@@ -24,6 +28,7 @@ const HeroBento: React.FC<HeroBentoProps> = ({
   isSearching,
   activeTask,
   setActiveTask,
+  
 }) => {
   const [image, setImage] = useState<File | null>(null);
   const [vibeBudget, setVibeBudget] = useState<string>("");
@@ -31,6 +36,26 @@ const HeroBento: React.FC<HeroBentoProps> = ({
   const [giftBudget, setGiftBudget] = useState<string>("");
   const [substituteQuery, setSubstituteQuery] = useState("");
   const [giftQuery, setGiftQuery] = useState("");
+  const [giftRecommendations, setGiftRecommendations] = useState<any>(null);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] =
+    useState(false);
+  // Handler for Gift Recommendations
+  const handleGiftRecommendations = async () => {
+    setIsLoadingRecommendations(true);
+    setGiftRecommendations(null);
+    try {
+      const payload = {
+        description: giftQuery,
+      };
+      const recs = await getRecommendations(payload);
+      const transformed = transformRecommendations(recs);
+      setGiftRecommendations(transformed);
+    } catch (err) {
+      setGiftRecommendations(null);
+    } finally {
+      setIsLoadingRecommendations(false);
+    }
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
@@ -134,14 +159,40 @@ const HeroBento: React.FC<HeroBentoProps> = ({
 
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="md:w-1/2 aspect-square md:aspect-auto h-80 border-2 border-dashed border-white/10 dark:border-white/10 light:border-black/10 rounded-[2.5rem] flex items-center justify-center overflow-hidden cursor-pointer group hover:border-teal/50 transition-all relative shadow-2xl bg-white/[0.01]">
+              className="
+    md:w-1/2
+    aspect-square
+    md:aspect-auto
+    h-80
+    border-2 border-dashed border-white/10
+    rounded-[2.5rem]
+    flex items-center justify-center
+    overflow-hidden
+    cursor-pointer
+    group
+    hover:border-teal/50
+    transition-all
+    relative
+    shadow-2xl
+    bg-white/[0.01]
+  ">
               {image ? (
                 <>
-                  <img
-                    src={URL.createObjectURL(image)}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    alt="Preview"
-                  />
+                  <div className="w-full h-full flex items-center justify-center p-8">
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt="Preview"
+                      className="
+            max-w-full max-h-full
+            object-contain
+            transition-transform duration-700
+            group-hover:scale-105
+            drop-shadow-[0_20px_40px_rgba(0,0,0,0.35)]
+          "
+                    />
+                  </div>
+
+                  {/* Scan line stays correct */}
                   <motion.div
                     initial={{ top: "0%" }}
                     animate={{ top: "100%" }}
@@ -150,7 +201,7 @@ const HeroBento: React.FC<HeroBentoProps> = ({
                       repeat: Infinity,
                       ease: "linear",
                     }}
-                    className="scan-line"
+                    className="scan-line pointer-events-none"
                   />
                 </>
               ) : (
@@ -288,13 +339,42 @@ const HeroBento: React.FC<HeroBentoProps> = ({
                       boxShadow: "0 0 40px rgba(255, 126, 95, 0.4)",
                     }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() =>
-                      onSearch(giftQuery, Number(giftBudget) || undefined)
-                    }
+                    onClick={handleGiftRecommendations}
                     className="bg-coral text-white px-16 rounded-2xl font-bold shadow-smooth transition-all h-16">
-                    SEARCH LIFESTYLE
+                    {isLoadingRecommendations
+                      ? "LOADING..."
+                      : "SEARCH LIFESTYLE"}
                   </motion.button>
                 </div>
+
+                {/* Gift Recommendations Results */}
+                {giftRecommendations && giftRecommendations.length > 0 && (
+                  <div className="mt-8 space-y-4">
+                    <h4 className="text-lg font-bold text-coral mb-4">
+                      Recommended Products ({giftRecommendations.length})
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4">
+                      {giftRecommendations.map((item: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="p-5 rounded-2xl bg-white/5 border border-coral/20 hover:bg-white/10 hover:border-coral/40 transition-all">
+                          <h5 className="font-semibold text-white mb-3 leading-tight">
+                            {item.title}
+                          </h5>
+                          {item.url && (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-coral/20 text-coral text-sm font-medium hover:bg-coral hover:text-white transition-all">
+                              View on Best Buy →
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                   {[

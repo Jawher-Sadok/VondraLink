@@ -16,13 +16,14 @@ export interface Product {
   };
   tags: string[];
   category: string;
+  savings: number;
 }
 
 export interface TradeOffPair {
   premium: Product;
   smart: Product;
   matchReason: string;
-  savings: number;
+  savings: number;   
 }
 
 export interface SearchState {
@@ -31,4 +32,10 @@ export interface SearchState {
   isSearching: boolean;
   imageInput?: string | File;
   results: TradeOffPair[];
+}
+
+export interface RecommendationRequest {
+  description: string;
+  isSearching: boolean;
+  results: Product[];
 }

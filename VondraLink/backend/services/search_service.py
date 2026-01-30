@@ -94,7 +94,8 @@ def fast_search(
             "score": f"{res.score:.4f}",
             "title": res.payload.get("title"),
             "price": f"${res.payload.get('price')}",
-            "link": res.payload.get("image_online")
+            "image": res.payload.get("image_online"), 
+            "link": res.payload.get("link"), 
         })
 
     return results
