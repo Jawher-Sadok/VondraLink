@@ -16,19 +16,26 @@ export interface Product {
   };
   tags: string[];
   category: string;
+  savings: number;
 }
 
 export interface TradeOffPair {
   premium: Product;
   smart: Product;
   matchReason: string;
-  savings: number;
+  savings: number;   
 }
 
 export interface SearchState {
   query: string;
   budgetLimit?: number;
   isSearching: boolean;
-  imageInput?: string;
+  imageInput?: string | File;
   results: TradeOffPair[];
+}
+
+export interface RecommendationRequest {
+  description: string;
+  isSearching: boolean;
+  results: Product[];
 }
